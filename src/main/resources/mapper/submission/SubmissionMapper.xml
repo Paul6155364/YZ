@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.iris.submission.mapper.SubmissionMapper">
+  <resultMap id="BaseResultMap" type="com.cn.iris.submission.entity.Submission">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="owner_id" jdbcType="VARCHAR" property="ownerId" />
+    <result column="auditor_id" jdbcType="VARCHAR" property="auditorId" />
+    <result column="modify" jdbcType="TIMESTAMP" property="modify" />
+    <result column="execution" jdbcType="VARCHAR" property="execution" />
+    <result column="execution_time" jdbcType="TIMESTAMP" property="executionTime" />
+    <result column="results" jdbcType="VARCHAR" property="results" />
+    <result column="query_results" jdbcType="VARCHAR" property="queryResults" />
+    <result column="overdue_results" jdbcType="VARCHAR" property="overdueResults" />
+    <result column="data_Source" jdbcType="VARCHAR" property="dataSource" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.cn.iris.submission.entity.SubmissionWithBLOBs">
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+    <result column="query" jdbcType="LONGVARCHAR" property="query" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, status, owner_id, auditor_id, modify, execution, execution_time, results, query_results, 
+    overdue_results, data_Source
+  </sql>
+  <sql id="Blob_Column_List">
+    content, query
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from submission
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectSubmissionList" resultType="com.cn.iris.submission.entity.SubmissionWithBLOBs" parameterType="java.lang.String">
+          select 
+	     a.id, a.status, a.owner_id, a.auditor_id, modify, a.execution, a.execution_time, a.results, a.query_results, 
+    a.overdue_results, a.data_Source,a.content, a.query, b.nick_name owner,c.nick_name auditor
+	    from submission a
+        LEFT JOIN sys_user b ON a.owner_id = b.id
+        LEFT JOIN sys_user c ON a.auditor_id = c.id
+        where a.owner_id = #{userID,jdbcType=VARCHAR}
+    </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from submission
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.cn.iris.submission.entity.SubmissionWithBLOBs">
+    insert into submission (id, status, owner_id, 
+      auditor_id, modify, execution, 
+      overdue_results, data_Source, content, 
+      query)
+    values (#{id,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{ownerId,jdbcType=VARCHAR}, 
+      #{auditorId,jdbcType=VARCHAR}, #{modify,jdbcType=TIMESTAMP}, #{execution,jdbcType=VARCHAR}, 
+      #{overdueResults,jdbcType=VARCHAR}, #{dataSource,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR}, 
+      #{query,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cn.iris.submission.entity.SubmissionWithBLOBs">
+    insert into submission
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="ownerId != null">
+        owner_id,
+      </if>
+      <if test="auditorId != null">
+        auditor_id,
+      </if>
+      <if test="modify != null">
+        modify,
+      </if>
+      <if test="execution != null">
+        execution,
+      </if>
+      <if test="executionTime != null">
+        execution_time,
+      </if>
+      <if test="results != null">
+        results,
+      </if>
+      <if test="queryResults != null">
+        query_results,
+      </if>
+      <if test="overdueResults != null">
+        overdue_results,
+      </if>
+      <if test="dataSource != null">
+        data_Source,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="query != null">
+        query,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="ownerId != null">
+        #{ownerId,jdbcType=VARCHAR},
+      </if>
+      <if test="auditorId != null">
+        #{auditorId,jdbcType=VARCHAR},
+      </if>
+      <if test="modify != null">
+        #{modify,jdbcType=TIMESTAMP},
+      </if>
+      <if test="execution != null">
+        #{execution,jdbcType=VARCHAR},
+      </if>
+      <if test="executionTime != null">
+        #{executionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="results != null">
+        #{results,jdbcType=VARCHAR},
+      </if>
+      <if test="queryResults != null">
+        #{queryResults,jdbcType=VARCHAR},
+      </if>
+      <if test="overdueResults != null">
+        #{overdueResults,jdbcType=VARCHAR},
+      </if>
+      <if test="dataSource != null">
+        #{dataSource,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="query != null">
+        #{query,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cn.iris.submission.entity.SubmissionWithBLOBs">
+    update submission
+    <set>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="ownerId != null">
+        owner_id = #{ownerId,jdbcType=VARCHAR},
+      </if>
+      <if test="auditorId != null">
+        auditor_id = #{auditorId,jdbcType=VARCHAR},
+      </if>
+      <if test="modify != null">
+        modify = #{modify,jdbcType=TIMESTAMP},
+      </if>
+      <if test="execution != null">
+        execution = #{execution,jdbcType=VARCHAR},
+      </if>
+      <if test="executionTime != null">
+        execution_time = #{executionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="results != null">
+        results = #{results,jdbcType=VARCHAR},
+      </if>
+      <if test="queryResults != null">
+        query_results = #{queryResults,jdbcType=VARCHAR},
+      </if>
+      <if test="overdueResults != null">
+        overdue_results = #{overdueResults,jdbcType=VARCHAR},
+      </if>
+      <if test="dataSource != null">
+        data_Source = #{dataSource,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="query != null">
+        query = #{query,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.cn.iris.submission.entity.SubmissionWithBLOBs">
+    update submission
+    set status = #{status,jdbcType=INTEGER},
+      owner_id = #{ownerId,jdbcType=VARCHAR},
+      auditor_id = #{auditorId,jdbcType=VARCHAR},
+      modify = #{modify,jdbcType=TIMESTAMP},
+      execution = #{execution,jdbcType=VARCHAR},
+      execution_time = #{executionTime,jdbcType=TIMESTAMP},
+      results = #{results,jdbcType=VARCHAR},
+      query_results = #{queryResults,jdbcType=VARCHAR},
+      overdue_results = #{overdueResults,jdbcType=VARCHAR},
+      data_Source = #{dataSource,jdbcType=VARCHAR},
+      content = #{content,jdbcType=LONGVARCHAR},
+      query = #{query,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cn.iris.submission.entity.Submission">
+    update submission
+    set status = #{status,jdbcType=INTEGER},
+      owner_id = #{ownerId,jdbcType=VARCHAR},
+      auditor_id = #{auditorId,jdbcType=VARCHAR},
+      modify = #{modify,jdbcType=TIMESTAMP},
+      execution = #{execution,jdbcType=VARCHAR},
+      execution_time = #{executionTime,jdbcType=TIMESTAMP},
+      results = #{results,jdbcType=VARCHAR},
+      query_results = #{queryResults,jdbcType=VARCHAR},
+      overdue_results = #{overdueResults,jdbcType=VARCHAR},
+      data_Source = #{dataSource,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <insert id="insertSqlVo" parameterType="com.cn.iris.submission.vo.SqlVo" >
+    ${sql}
+  </insert>
+  <delete id="deleteSqlVo" parameterType="com.cn.iris.submission.vo.SqlVo" >
+    ${sql}
+  </delete>
+  <update id="updateSqlVo" parameterType="com.cn.iris.submission.vo.SqlVo" >
+    ${sql}
+  </update>
+  <select id="selectSqlVo" parameterType="com.cn.iris.submission.vo.SqlVo" resultType="java.lang.Integer">
+    ${sql}
+  </select>
+  <select id="selectQuerySqlVo" parameterType="com.cn.iris.submission.vo.SqlVo" resultType="java.lang.Integer">
+    ${sql}
+  </select>
+  
+</mapper>
