@@ -63,60 +63,17 @@
                         </ul>
                     </li>
                     <!--菜单循环结束 -->
-                    <!--  <li>
-                        <a href="#">
-                            <i class="fa fa fa-bar-chart-o"></i>
-                            <span class="nav-label">统计图表</span>
-                            <span class="fa arrow"></span>
-                        </a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a class="J_menuItem" href="graph_echarts.html">百度ECharts</a>
-                            </li>
-                            <li>
-                                <a class="J_menuItem" href="graph_flot.html">Flot</a>
-                            </li>
-                            <li>
-                                <a class="J_menuItem" href="graph_morris.html">Morris.js</a>
-                            </li>
-                            <li>
-                                <a class="J_menuItem" href="graph_rickshaw.html">Rickshaw</a>
-                            </li>
-                            <li>
-                                <a class="J_menuItem" href="graph_peity.html">Peity</a>
-                            </li>
-                            <li>
-                                <a class="J_menuItem" href="graph_sparkline.html">Sparkline</a>
-                            </li>
-                            <li>
-                                <a class="J_menuItem" href="graph_metrics.html">图表组合</a>
-                            </li>
-                        </ul>
-                    </li>-->
                     <li class="line dk"></li>
                     <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
                         <span class="ng-scope">提交模块</span>
                     </li>
                     <li>
-                        <a href="#"><i class="fa fa fa-bar-chart-o"></i> <span class="nav-label">提交管理 </span></a>
+                        <a href="J_menuItem"><i class="fa fa fa-bar-chart-o"></i> <span class="nav-label">提交管理 </span>
+                          <span class="fa arrow" ></span></a>
                         <ul class="nav nav-second-level">
-                            <li><a class="J_menuItem" href="/submission/index">提交结果</a>
+                            <li><a class="J_menuItem" href="/submission/index">  <i class="fa fa-home"></i><span class="nav-label">提交结果</span></a>
                             </li>
-                            <!--<li><a class="J_menuItem" href="mail_detail.html">查看邮件</a>
-                            </li>
-                            <li><a class="J_menuItem" href="mail_compose.html">写信</a>
-                            </li>-->
                         </ul>
-                    </li>
-                    <li class="line dk"></li>
-                    <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
-                        <span class="ng-scope">审核模块</span>
-                    </li>
-                    <li>
-                        <a class="J_menuItem" href="/examine/index">
-                            <i class="fa fa-home"></i>
-                            <span class="nav-label">审核结果</span>
-                        </a>
                     </li>
                 </ul>
             </div>
@@ -133,7 +90,7 @@
                         </form>
                     </div>
                     <ul class="nav navbar-top-links navbar-right">
-                        <li class="dropdown">
+                        <!--  <li class="dropdown">
                             <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
                                 <i class="fa fa-envelope"></i> <span class="label label-warning">16</span>
                             </a>
@@ -175,7 +132,7 @@
                                 </li>
                             </ul>
                         </li>
-                        <li class="dropdown">
+                         <li class="dropdown">
                             <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
                                 <i class="fa fa-bell"></i> <span class="label label-primary">8</span>
                             </a>
@@ -207,7 +164,7 @@
                                     </div>
                                 </li>
                             </ul>
-                        </li>
+                        </li>-->
                         <li class="dropdown">
                             <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
                                 <i th:text="' '+${user.nickName}" class="fa fa-user"></i>

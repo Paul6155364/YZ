@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cn.iris.submission.mapper.DatasourceMapper">
+  <resultMap id="BaseResultMap" type="com.cn.iris.submission.entity.Datasource">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="data_Source" jdbcType="VARCHAR" property="dataSource" />
+    <result column="dbname" jdbcType="VARCHAR" property="dbname" />
+    <result column="drive" jdbcType="VARCHAR" property="drive" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, data_Source, dbname, drive, url, username, password
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from datasource
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+   <select id="dbchose" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from datasource
+    where data_Source = #{db,jdbcType=VARCHAR}
+  </select>
+    <select id="loadSelect"  resultMap="BaseResultMap">
+    select 
+    data_Source,dbname
+    from datasource
+    group by data_Source,dbname
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from datasource
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.cn.iris.submission.entity.Datasource">
+    insert into datasource (id, data_Source, dbname, 
+      drive, url, username, 
+      password)
+    values (#{id,jdbcType=VARCHAR}, #{dataSource,jdbcType=VARCHAR}, #{dbname,jdbcType=VARCHAR}, 
+      #{drive,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, 
+      #{password,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cn.iris.submission.entity.Datasource">
+    insert into datasource
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="dataSource != null">
+        data_Source,
+      </if>
+      <if test="dbname != null">
+        dbname,
+      </if>
+      <if test="drive != null">
+        drive,
+      </if>
+      <if test="url != null">
+        url,
+      </if>
+      <if test="username != null">
+        username,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="dataSource != null">
+        #{dataSource,jdbcType=VARCHAR},
+      </if>
+      <if test="dbname != null">
+        #{dbname,jdbcType=VARCHAR},
+      </if>
+      <if test="drive != null">
+        #{drive,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cn.iris.submission.entity.Datasource">
+    update datasource
+    <set>
+      <if test="dataSource != null">
+        data_Source = #{dataSource,jdbcType=VARCHAR},
+      </if>
+      <if test="dbname != null">
+        dbname = #{dbname,jdbcType=VARCHAR},
+      </if>
+      <if test="drive != null">
+        drive = #{drive,jdbcType=VARCHAR},
+      </if>
+      <if test="url != null">
+        url = #{url,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null">
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cn.iris.submission.entity.Datasource">
+    update datasource
+    set data_Source = #{dataSource,jdbcType=VARCHAR},
+      dbname = #{dbname,jdbcType=VARCHAR},
+      drive = #{drive,jdbcType=VARCHAR},
+      url = #{url,jdbcType=VARCHAR},
+      username = #{username,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

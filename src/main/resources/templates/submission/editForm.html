@@ -27,39 +27,79 @@
                            <textarea class="form-control" rows="10" name="content" id="content" th:text="${submissionWithBLOBs.content}" ></textarea>
                         </div>
                     </div>
-                        <div class="form-group">
+                    <div class="form-group">
+                        <div class="col-sm-2">
+		                    <button type="button" class="btn btn-w-m btn-danger" onclick="populated()">预生成查询语句</button>
+		            	</div>
+		            </div>
+                    <div class="form-group">
                         <label class="col-sm-2 control-label">查询SQL：</label>
                         <div class="col-sm-8">
                            <textarea class="form-control" rows="10" name="query" id="query" th:text="${submissionWithBLOBs.query}"></textarea>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <div class="col-sm-2">
+		                    <button type="button" class="btn btn-w-m btn-danger" onclick="doquery()">执行查询语句</button>
+		            	</div>
+            		</div>
             </div>
             <div class="col-sm-5 ">
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">审核人：</label>
-                        <div class="col-sm-9">
-                            <input type="text" id="auditorid" name="auditorid" placeholder="请输入审核人" class="form-control" th:value="${submissionWithBLOBs.auditorId}"/>
+                        <label class="col-sm-4 control-label">执行操作：</label>
+                        <div class="col-sm-8">
+                         <select class="form-control" id="execution" name="execution">
+						      <option value="insert" th:selected="${submissionWithBLOBs.execution=='insert'}">新增</option>
+						      <option value="update" th:selected="${submissionWithBLOBs.execution=='update'}">修改</option>
+						      <option value="delete" th:selected="${submissionWithBLOBs.execution=='delete'}">删除</option>
+						</select>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">执行操作：</label>
-                        <div class="col-sm-9">
-                            <input type="text" id="execution" name="execution" placeholder="请输入执行操作" class="form-control" th:value="${submissionWithBLOBs.execution}"/>
+                        <label class="col-sm-4 control-label">数据库：</label>
+                        <input type="hidden" id="dbcs" th:value="${submissionWithBLOBs.dataSource}" />
+                        <div class="col-sm-8">
+                            <select class="form-control" id="dataSource" name="dataSource" onchange="dbchose()" style="height:40px">
+                            
+							</select>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">数据源：</label>
-                        <div class="col-sm-9">
-                            <input type="text" id="dataSource" name="dataSource" placeholder="请输入数据源" class="form-control" th:value="${submissionWithBLOBs.dataSource}"/>
+                        <label class="col-sm-4 control-label">数据库驱动：</label>
+                        <div class="col-sm-8">
+                            <input type="text" id="dbdriver" name="dbdriver" placeholder="请输入数据库驱动" class="form-control" readonly="readonly" th:value="${dbsource.drive}"/>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">预期结果：</label>
-                        <div class="col-sm-9">
+                        <label class="col-sm-4 control-label">数据链接：</label>
+                        <div class="col-sm-8">
+                            <input type="text" id="dburl" name="dburl" placeholder="请输入数据库驱动" class="form-control" readonly="readonly" th:value="${dbsource.url}"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">数据库用户名：</label>
+                        <div class="col-sm-8">
+                            <input type="text" id="dbusername" name="dbusername" placeholder="请输入数据库驱动" class="form-control" readonly="readonly" th:value="${dbsource.username}"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">数据库密码：</label>
+                        <div class="col-sm-8">
+                            <input type="password" id="dbpassword" name="dbpassword" placeholder="请输入数据库驱动" class="form-control" readonly="readonly" th:value="${dbsource.password}"/>
+                        </div>
+                    </div>
+                   <div class="form-group">
+                        <label class="col-sm-4 control-label">预期结果：</label>
+                        <div class="col-sm-8">
                             <input type="text" id="overdueresults" name="overdueresults" placeholder="请输入预期结果" class="form-control" th:value="${submissionWithBLOBs.overdueResults}"/>
                         </div>
                     </div>
-              
+                     <div class="form-group">
+                        <label class="col-sm-4 control-label">查询结果：</label>
+                        <div class="col-sm-8">
+                            <input type="text" id="queryresults" name="queryresults" placeholder="请输入查询结果" class="form-control" readonly="readonly" th:value="${submissionWithBLOBs.queryResults}"/>
+                        </div>
+                    </div>
             </div>
               </form>
             <div class="col-sm-12">
@@ -84,7 +124,6 @@
     <script src="/js/submission/editForm.js"></script>
     <!-- Web Uploader -->
     <script src="/js/plugins/webuploader/webuploader.min.js"></script>
-    <script src="/js/demo/webuploader-demo.js"></script>
 
     <!-- jQuery Validation plugin javascript-->
     <script src="/js/plugins/treeview/bootstrap-treeview.js"></script>

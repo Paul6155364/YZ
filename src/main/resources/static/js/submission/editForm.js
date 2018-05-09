@@ -1,18 +1,15 @@
 var BASE_URL = 'js/plugins/webuploader';
 
 $(document).ready(function () {
-    //初始化部门树
-    //initDeptTree();
-
+	loadSelect();
     $("#userForm").validate({
         rules: {
-        	id:{required: true, minlength:1},
         	query: {required: true, minlength:1},
         	content: {required: true, minlength:1},
-        	auditorid: {required: true, minlength:1},
         	execution: {required: true, minlength:1, maxlength:10},
-        	dataSource: {required: false, maxlength:40},
-        	overdueresults:{required: false, maxlength:40}
+        	dataSource: {required: true, maxlength:40},
+        	overdueresults:{required: true, maxlength:40},
+        	queryresults:{required: false, maxlength:40}
         },
         submitHandler:function(){
             $.ajax({
@@ -45,42 +42,81 @@ function cancel() {
     parent.layer.close(index);
 }
 
-function initDeptTree() {
-    $.ajax({
-        type: "GET",
+function loadSelect(){
+	$("select[name=dataSource]").empty();      //清空 
+	$("select[name=dataSource]").append("<option value=\"\">请选择数据库</option>")
+	var dbcs = $('#dbcs').val();
+	$.ajax({
+        type: "POST",
         dataType: "json",
-        url: "/dept/list",
-        success: function(ret){
-            if(ret.success){
-                var alternateData = ret.data;
-                //树
-                $('#deptTree').treeview({
-                    expandIcon: "fa fa-plus-square",
-                    collapseIcon: "fa fa-minus-square",
-                    nodeIcon: "fa fa-bookmark",
-                    color: "white",			//字体颜色
-                    backColor: "#1c2b36",		//背景颜色
-                    onhoverColor: "#696969",//鼠标放上时颜色
-                    showBorder: false,
-                    showTags: true,
-                    highlightSelected: true,
-                    selectedColor: "black",//选中时字体颜色
-                    selectedBackColor: "#5CACEE",//选中时背景颜色
-                    data: alternateData,
-                    onNodeSelected:function(event, data) {
-                        $('#deptId').val(data.id);
-                        $('#deptName').val(data.name);
-                        $('#deptTree').hide();
-                    },
-                    onNodeUnselected:function(event, data) {
-                        $('#deptId').val(data.id);
-                        $('#deptName').val(data.name);
-                        $('#deptTree').hide();
-                    }
-                });
-            }else{
-                layer.msg(ret.message, {time: 3000,icon:2},function () {});
-            }
+        url: "/submission/loadSelect",
+        success: function(data){
+            var modelList = data.dbList;  
+            if(modelList && modelList.length != 0){  
+                for(var i=0; i<modelList.length; i++){ 
+                	if (dbcs == modelList[i].dataSource) {  
+                		var option="<option value=\""+modelList[i].dataSource+"\" selected ";  
+                        option += ">"+modelList[i].dbname+"</option>";  //动态添加数据  
+                        $("select[name=dataSource]").append(option); 
+                    } else {  
+                    	 var option="<option value=\""+modelList[i].dataSource+"\"";  
+                         option += ">"+modelList[i].dbname+"</option>";  //动态添加数据  
+                         $("select[name=dataSource]").append(option);  
+                    }  
+                     
+                }  
+            }  
+        }
+    });
+}
+function populated(){
+	$.ajax({
+        type: "POST",
+        dataType: "json",
+        data:{db:$('#content').val()},
+        url: "/submission/populated",
+        success: function(data){
+            var modelList = data.sql;  
+            $("#query").val(modelList); 
+        }
+    });
+	
+}
+function doquery(){
+	
+	var options=$("#dataSource option:selected");
+	if($('#query').val()==null||$('#query').val()==""){
+		layer.alert('预查询语句不能为空！');
+		 return false;
+	}
+	if(options.val()==null||options.val()==""){
+		layer.alert('数据源不能为空！');
+		 return false;
+	}
+	$.ajax({
+        type: "POST",
+        dataType: "json",
+        data:{db:options.val(),query:$('#query').val()},
+        url: "/submission/doquery",
+        success: function(data){
+            var modelList = data.count;  
+            $("#queryresults").val(modelList); 
+        }
+    });
+}
+function dbchose(){
+	var options=$("#dataSource option:selected");
+	$.ajax({
+        type: "POST",
+        dataType: "json",
+        data:{db:options.val()},
+        url: "/submission/dbchose",
+        success: function(data){
+            var modelList = data.dbList;  
+            $("#dbdriver").val(modelList.drive); 
+        	$("#dburl").val(modelList.url);
+        	$("#dbusername").val(modelList.username);
+        	$("#dbpassword").val(modelList.password);
         }
     });
 }

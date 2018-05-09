@@ -24,9 +24,6 @@ public interface ISubmissionService {
 	
 	public boolean deleteById(String id);
 	
-	public boolean execution(String content,String execution);
-	public boolean executionds1(String content,String execution);
-	public boolean executionds2(String content,String execution);
-	public boolean executionds3(String content,String execution);
-	public Integer queryExecution(String query);
+	public Integer execution(String content,String driver,String url,String username,String password);
+	public Integer queryExecution(String query,String driver,String url,String username,String password);
 }

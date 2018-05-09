@@ -49,12 +49,12 @@
   <insert id="insert" parameterType="com.cn.iris.submission.entity.SubmissionWithBLOBs">
     insert into submission (id, status, owner_id, 
       auditor_id, modify, execution, 
-      overdue_results, data_Source, content, 
+      overdue_results, data_Source, content,query_results 
       query)
     values (#{id,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{ownerId,jdbcType=VARCHAR}, 
       #{auditorId,jdbcType=VARCHAR}, #{modify,jdbcType=TIMESTAMP}, #{execution,jdbcType=VARCHAR}, 
       #{overdueResults,jdbcType=VARCHAR}, #{dataSource,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR}, 
-      #{query,jdbcType=LONGVARCHAR})
+      #{query,jdbcType=LONGVARCHAR},#{queryResults,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.cn.iris.submission.entity.SubmissionWithBLOBs">
     insert into submission

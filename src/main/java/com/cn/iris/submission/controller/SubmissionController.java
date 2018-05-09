@@ -1,6 +1,9 @@
 package com.cn.iris.submission.controller;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +26,10 @@ import com.baomidou.mybatisplus.plugins.Page;
 import com.cn.iris.admin.entity.User;
 import com.cn.iris.common.util.AjaxRetBean;
 import com.cn.iris.common.util.ResWriteUtil;
+import com.cn.iris.common.util.sql.SqlParserUtil;
+import com.cn.iris.submission.entity.Datasource;
 import com.cn.iris.submission.entity.SubmissionWithBLOBs;
+import com.cn.iris.submission.service.IDatasourceService;
 import com.cn.iris.submission.service.ISubmissionService;
 
 
@@ -40,6 +46,8 @@ public class SubmissionController {
 
     @Autowired
     private ISubmissionService submissionServiceImpl;
+    @Autowired
+    private IDatasourceService datasourceServiceImpl;
 
     @GetMapping("/index")
     public String index() {
@@ -56,6 +64,7 @@ public class SubmissionController {
 
     @GetMapping("/add")
     public String addUser(){
+    	
         return "/submission/addForm";
     }
 
@@ -69,19 +78,16 @@ public class SubmissionController {
              if(submissionWithBLOBs != null && submissionWithBLOBs.getId() != null){
             	 Integer status = submissionWithBLOBs.getStatus();
             	 if(status==1) {
-            		  String execution = submissionWithBLOBs.getExecution();
                       String content = submissionWithBLOBs.getContent();
-                      String query = submissionWithBLOBs.getQuery();
                       String dataSource = submissionWithBLOBs.getDataSource();
-                      if(dataSource.equals("ds1")) {
-                    	  flag = submissionServiceImpl.executionds1(content, execution);
-                      }else if(dataSource.equals("ds2")) {
-                    	  flag = submissionServiceImpl.executionds2(content, execution);
-                      }
-                      //Integer count = submissionServiceImpl.queryExecution(query);
                       submissionWithBLOBs.setExecutionTime(new Date());
-                      //submissionWithBLOBs.setQueryResults(count.toString());
+                      Datasource dbsource = datasourceServiceImpl.dbchose(dataSource);
+                      Integer results = submissionServiceImpl.execution(content, dbsource.getDrive(), dbsource.getUrl(), dbsource.getUsername(), dbsource.getPassword());
+                      submissionWithBLOBs.setResults(results.toString());
                       submissionServiceImpl.updateSubmissionById(submissionWithBLOBs);
+                      if(results>0){  
+                    	  flag=true; 
+                      } 
             	 }
                  if(flag){
                      returnBean.setSuccess(true);
@@ -107,7 +113,9 @@ public class SubmissionController {
         if(id != null){
         	SubmissionWithBLOBs submissionWithBLOBs = submissionServiceImpl.selectById(id);
             if(submissionWithBLOBs != null && submissionWithBLOBs.getId() != null){
+            	Datasource dbsource = datasourceServiceImpl.dbchose(submissionWithBLOBs.getDataSource());
                 model.addAttribute("submissionWithBLOBs",submissionWithBLOBs);
+                model.addAttribute("dbsource",dbsource);
                 return "/submission/editForm";
             }
         }
@@ -120,7 +128,7 @@ public class SubmissionController {
     	String content = request.getParameter("content").replaceAll("'", "\\'");
     	String query = request.getParameter("query").replaceAll("'", "\\'");
     	String dataSource = request.getParameter("dataSource");
-    	String auditorId = request.getParameter("auditorid");
+    	String queryresults = request.getParameter("queryresults");
     	String overdueResults = request.getParameter("overdueresults");
     	String execution = request.getParameter("execution");
     	SubmissionWithBLOBs submissionWithBLOBs = new SubmissionWithBLOBs();
@@ -133,7 +141,7 @@ public class SubmissionController {
         submissionWithBLOBs.setContent(content);
         submissionWithBLOBs.setQuery(query);
         submissionWithBLOBs.setDataSource(dataSource);
-        submissionWithBLOBs.setAuditorId(auditorId);
+        submissionWithBLOBs.setQueryResults(queryresults);
         submissionWithBLOBs.setStatus(1);
         submissionWithBLOBs.setOverdueResults(overdueResults);
         submissionWithBLOBs.setExecution(execution);
@@ -161,7 +169,7 @@ public class SubmissionController {
         String content = request.getParameter("content").replaceAll("'", "\\'");
     	String query = request.getParameter("query").replaceAll("'", "\\'");
     	String dataSource = request.getParameter("dataSource");
-    	String auditorId = request.getParameter("auditorid");
+    	String queryresults = request.getParameter("queryresults");
     	String overdueResults = request.getParameter("overdueresults");
     	String execution = request.getParameter("execution");
     	SubmissionWithBLOBs submissionWithBLOBs = new SubmissionWithBLOBs();
@@ -170,7 +178,7 @@ public class SubmissionController {
     	submissionWithBLOBs.setContent(content);
     	submissionWithBLOBs.setQuery(query);
     	submissionWithBLOBs.setDataSource(dataSource);
-    	submissionWithBLOBs.setAuditorId(auditorId);
+    	submissionWithBLOBs.setQueryResults(queryresults);
     	submissionWithBLOBs.setOverdueResults(overdueResults);
     	submissionWithBLOBs.setExecution(execution);
     	submissionWithBLOBs.setModify(new Date());
@@ -217,5 +225,62 @@ public class SubmissionController {
         }
         ResWriteUtil.writeObject(response,returnBean);
     }
+    @ResponseBody
+    @RequestMapping(value="/loadSelect",produces = "application/json;charset=UTF-8")
+    public Map<String, Object> loadSelect() {
+    	List<Datasource> dbList = datasourceServiceImpl.loadSelect();
+        //以json格式的形式返回数据到前台easyui控件  
+        Map<String,Object> result = new HashMap<String, Object>();  
+        result.put("dbList", dbList);  
+        return result; 
+    }
+    @ResponseBody
+    @RequestMapping(value="/dbchose",produces = "application/json;charset=UTF-8")
+    public Map<String, Object> dbchose(@RequestParam String db) {
+    	Datasource dbsource = datasourceServiceImpl.dbchose(db);
+        //以json格式的形式返回数据到前台easyui控件  
+        Map<String,Object> result = new HashMap<String, Object>();  
+        result.put("dbList", dbsource);  
+        return result; 
+    }
+    @ResponseBody
+    @RequestMapping(value="/populated",produces = "application/json;charset=UTF-8")
+    public Map<String, Object> populated(@RequestParam String db) {
+    	String sql =  db.trim().toLowerCase().replace("\\s{1,}", " ");
+    	String sqly ="";
+    	System.out.println(sql);
+		int intInsert = sql.substring(0, 12).indexOf("insert");
+		int intDelete = sql.substring(0, 12).indexOf("delete"); 
+		int intUpdate = sql.substring(0, 12).indexOf("update"); 
+		if(intInsert == - 1&&intDelete==-1&&intUpdate == - 1){  
+		       System.out.println("没有找到字符串");
+		}else if(intInsert != - 1&&intDelete==-1&&intUpdate == - 1){
+		       sqly="select count(*) from "+sql.substring(11,sql.indexOf("("));
+		       System.out.println("sqly 字符串位置:" + sqly); 
+		} 
+		else if(intInsert == - 1&&intDelete!=-1&&intUpdate == - 1){
+		       sqly=sql.replace("delete", "select count(*)");
+		       System.out.println("sqly 字符串位置:" + sqly); 
+		} 
+		else if(intInsert == - 1&&intDelete==-1&&intUpdate != - 1){
+	       sqly="select count(*) from "+sql.substring(7,sql.indexOf("set"))+" "+sql.substring(sql.indexOf("where"));
+	       System.out.println("sqly 字符串位置:" + sqly); 
+	    }  
+        //以json格式的形式返回数据到前台easyui控件  
+        Map<String,Object> result = new HashMap<String, Object>();  
+        result.put("sql", sqly);  
+        return result; 
+    }
+    @ResponseBody
+    @RequestMapping(value="/doquery",produces = "application/json;charset=UTF-8")
+    public Map<String, Object> doquery(@RequestParam String db,@RequestParam String query) {
+    	Datasource dbsource = datasourceServiceImpl.dbchose(db);
+    	Integer count = submissionServiceImpl.queryExecution(query.replaceAll("'", "\\'"),dbsource.getDrive(),dbsource.getUrl(),dbsource.getUsername(),dbsource.getPassword());
+        //以json格式的形式返回数据到前台easyui控件  
+        Map<String,Object> result = new HashMap<String, Object>();  
+        result.put("count", count);  
+        return result; 
+    }
+    
 
 }

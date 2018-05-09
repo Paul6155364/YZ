@@ -55,7 +55,6 @@ $(document).ready(function () {
             {title: "SQL内容",field: "content"},
             {title: "查询语句",field: "query"},
             {title: "提交人",field: "owner"},
-            {title: "审核人",field: "auditor"},
             {title: "数据源",field: "dataSource"},
             {title: "执行操作",field: "execution"},
             {title: "执行结果",field: "results"},

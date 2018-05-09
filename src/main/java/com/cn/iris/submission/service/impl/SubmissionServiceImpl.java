@@ -1,5 +1,8 @@
 package com.cn.iris.submission.service.impl;
 
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -13,17 +16,16 @@ import com.cn.iris.submission.entity.SubmissionWithBLOBs;
 import com.cn.iris.submission.mapper.SubmissionMapper;
 import com.cn.iris.submission.service.ISubmissionService;
 import com.cn.iris.submission.vo.SqlVo;
-import java.sql.CallableStatement;  
-import java.sql.Connection;  
-import java.sql.PreparedStatement;  
-import java.sql.Statement; 
 @Service
 public class SubmissionServiceImpl implements ISubmissionService {
-	private static Connection conn = null;  
-    private static PreparedStatement ps = null;  
-    private static ResultSet rs = null;  
-    private static final CallableStatement cs = null;  
-
+	// 定义数据库的链接  
+    private Connection connection;  
+  
+    // 定义sql语句的执行对象  
+    private PreparedStatement pstmt;  
+  
+    // 定义查询返回的结果集合  
+    private ResultSet resultSet; 
 	@Autowired
     private SubmissionMapper submissionMapper;
 
@@ -41,7 +43,7 @@ public class SubmissionServiceImpl implements ISubmissionService {
 
 	@Override
 	public SubmissionWithBLOBs selectById(String id) {
-		// TODO Auto-generated method stub
+		
 		return submissionMapper.selectByPrimaryKey(id);
 	}
 
@@ -58,30 +60,57 @@ public class SubmissionServiceImpl implements ISubmissionService {
 	}
 
 	@Override
-	public boolean execution(String content, String execution) {
-		SqlVo sqlVo = new SqlVo();
-		sqlVo.setSql(content);
-		 boolean flag = false;
-		if("insert".equals(execution)) {
-			flag = submissionMapper.insertSqlVo(sqlVo);
-		}else if("delete".equals(execution)) {
-			flag = submissionMapper.deleteSqlVo(sqlVo);
-		}else if("update".equals(execution)) {
-			flag = submissionMapper.updateSqlVo(sqlVo);
-		}else if("select".equals(execution)) {
-			flag = submissionMapper.selectSqlVo(sqlVo);
-		}
-		return flag;
+	public Integer execution(String content,String driver,String url,String username,String password) {
+		JdbcUtil jdbcUtil = null;  
+        int count = 0;
+        try {  
+            jdbcUtil = new JdbcUtil();  
+            connection = jdbcUtil.getConnection(driver, url, username, password); // 获取数据库链接  
+            pstmt= connection.prepareStatement(content);//把写好的sql语句传递到数据库，让数据库知道我们要干什么  
+            
+            count=pstmt.executeUpdate();
+            if(count>0){  
+                System.out.println("操作成功");  
+            }else{  
+                System.out.println("操作失败");  
+            }  
+        } catch (SQLException e) {  
+            System.out.println(this.getClass()+"增删改异常！");  
+            e.printStackTrace();  
+        } finally {  
+            if (jdbcUtil != null) {  
+                jdbcUtil.releaseConn(); // 一定要释放资源  
+            }  
+        }
+		
+		return count;
 	}
 	
 
 	@Override
-	public Integer queryExecution(String query) {
-		SqlVo sqlVo = new SqlVo();
-		sqlVo.setSql(query);
-		return submissionMapper.selectQuerySqlVo(sqlVo);
+	public Integer queryExecution(String query,String driver,String url,String username,String password) {
+		JdbcUtil jdbcUtil = null;  
+        int count = 0;
+        try {  
+            jdbcUtil = new JdbcUtil();  
+            connection = jdbcUtil.getConnection(driver, url, username, password); // 获取数据库链接  
+            pstmt= connection.prepareStatement(query);//把写好的sql语句传递到数据库，让数据库知道我们要干什么  
+            resultSet=pstmt.executeQuery();
+            if(resultSet.next()) {
+            count=resultSet.getInt(1);
+            System.out.println("count:"+count);
+            }
+        } catch (SQLException e) {  
+            System.out.println(this.getClass()+"执行预查询抛出异常！");  
+            e.printStackTrace();  
+        } finally {  
+            if (jdbcUtil != null) {  
+                jdbcUtil.releaseConn(); // 一定要释放资源  
+            }  
+        }
+		return count;
 	}
-	// 使用数据源ds2
+	/*// 使用数据源ds2
 		@TargetDataSource("ds1")
 	@Override
 	public boolean executionds1(String content, String execution) {
@@ -106,7 +135,7 @@ public class SubmissionServiceImpl implements ISubmissionService {
 		SqlVo sqlVo = new SqlVo();
 		sqlVo.setSql(content);
 		 boolean flag = false;
-		 /*JdbcUtil jdbcUtil = null;  
+		 JdbcUtil jdbcUtil = null;  
 	        boolean bool = false;  
 	        try {  
 	            jdbcUtil = new JdbcUtil();  
@@ -125,7 +154,7 @@ public class SubmissionServiceImpl implements ISubmissionService {
 	            if (jdbcUtil != null) {  
 	                jdbcUtil.releaseConn(); // 一定要释放资源  
 	            }  
-	        }  */
+	        }  
 	        System.out.println("执行更新的结果："+flag); 
 		if("insert".equals(execution)) {
 			flag = submissionMapper.insertSqlVo(sqlVo);
@@ -155,5 +184,5 @@ public class SubmissionServiceImpl implements ISubmissionService {
 			flag = submissionMapper.selectSqlVo(sqlVo);
 		}
 		return flag;
-	}
+	}*/
 }

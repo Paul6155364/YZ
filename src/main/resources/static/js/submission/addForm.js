@@ -1,17 +1,15 @@
 var BASE_URL = 'js/plugins/webuploader';
 
 $(document).ready(function () {
-    //初始化部门树
-    //initDeptTree();
-
+	loadSelect();
     $("#userForm").validate({
         rules: {
         	query: {required: true, minlength:1},
         	content: {required: true, minlength:1},
-        	auditorid: {required: true, minlength:1},
         	execution: {required: true, minlength:1, maxlength:10},
-        	dataSource: {required: false, maxlength:40},
-        	overdueresults:{required: false, maxlength:40}
+        	dataSource: {required: true, maxlength:40},
+        	overdueresults:{required: true, maxlength:40},
+        	queryresults:{required: false, maxlength:40}
         },
         messages: {},
         submitHandler:function(){
@@ -44,14 +42,75 @@ function cancel() {
     var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
     parent.layer.close(index);
 }
+function loadSelect(){
+	$("select[name=dataSource]").empty();      //清空 
+	$("select[name=dataSource]").append("<option value=\"\">请选择数据库</option>")
+	$.ajax({
+        type: "POST",
+        dataType: "json",
+        url: "/submission/loadSelect",
+        success: function(data){
+            var modelList = data.dbList;  
+            if(modelList && modelList.length != 0){  
+                for(var i=0; i<modelList.length; i++){  
+                    var option="<option value=\""+modelList[i].dataSource+"\"";  
+                    option += ">"+modelList[i].dbname+"</option>";  //动态添加数据  
+                    $("select[name=dataSource]").append(option);  
+                }  
+            }  
+        }
+    });
+}
 function populated(){
-	$("#query").val("select count(*) from jq_sys_user"); 
+	$.ajax({
+        type: "POST",
+        dataType: "json",
+        data:{db:$('#content').val()},
+        url: "/submission/populated",
+        success: function(data){
+            var modelList = data.sql;  
+            $("#query").val(modelList); 
+        }
+    });
+	
+}
+function doquery(){
+	
+	var options=$("#dataSource option:selected");
+	if($('#query').val()==null||$('#query').val()==""){
+		layer.alert('预查询语句不能为空！');
+		 return false;
+	}
+	if(options.val()==null||options.val()==""){
+		layer.alert('数据源不能为空！');
+		 return false;
+	}
+	$.ajax({
+        type: "POST",
+        dataType: "json",
+        data:{db:options.val(),query:$('#query').val()},
+        url: "/submission/doquery",
+        success: function(data){
+            var modelList = data.count;  
+            $("#queryresults").val(modelList); 
+        }
+    });
 }
 function dbchose(){
-	$("#dbdriver").val("com.mysql.jdbc.Driver"); 
-	$("#dburl").val("jdbc:mysql://localhost:3306/test1?useUnicode=true&autoReconnect=true&characterEncoding=UTF-8");
-	$("#dbusername").val("root");
-	$("#dbpassword").val("root");
+	var options=$("#dataSource option:selected");
+	$.ajax({
+        type: "POST",
+        dataType: "json",
+        data:{db:options.val()},
+        url: "/submission/dbchose",
+        success: function(data){
+            var modelList = data.dbList;  
+            $("#dbdriver").val(modelList.drive); 
+        	$("#dburl").val(modelList.url);
+        	$("#dbusername").val(modelList.username);
+        	$("#dbpassword").val(modelList.password);
+        }
+    });
 }
 function hideDeptTree() {
     var tree = $('#deptTree').css('display');
