@@ -67,7 +67,6 @@ public class SubmissionServiceImpl implements ISubmissionService {
             jdbcUtil = new JdbcUtil();  
             connection = jdbcUtil.getConnection(driver, url, username, password); // 获取数据库链接  
             pstmt= connection.prepareStatement(content);//把写好的sql语句传递到数据库，让数据库知道我们要干什么  
-            
             count=pstmt.executeUpdate();
             if(count>0){  
                 System.out.println("操作成功");  

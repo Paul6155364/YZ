@@ -72,7 +72,7 @@ function showMenuInfo(menu,showOrHide){
     }
 
     if(showOrHide){
-        //$("#id").removeAttr("disabled");
+        $("#id").removeAttr("disabled");
         $('#code').removeAttr("disabled");
         $('#name').removeAttr("disabled");
         $('#icon').removeAttr("disabled");

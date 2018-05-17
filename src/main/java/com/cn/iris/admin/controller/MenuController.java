@@ -81,8 +81,10 @@ public class MenuController {
         AjaxRetBean<Menu> returnBean =  new AjaxRetBean<> ();
         try {
             Menu parentMenu = menuServiceImpl.selectById(menu.getpId());
-            menu.setpIds(parentMenu.getpIds()+",["+parentMenu.getId()+"]");
-            menu.setLevels(parentMenu.getLevels()+1);
+            if(parentMenu!=null) {
+            	menu.setpIds(parentMenu.getpIds()+",["+parentMenu.getId()+"]");
+            	menu.setLevels(parentMenu.getLevels()+1);
+            }
             boolean sucFlag;
             if(null != menu.getId()){//更新
                 sucFlag = menuServiceImpl.updateAllColumnById(menu);
